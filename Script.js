@@ -1,54 +1,60 @@
-// 1. शुरुआती सेटिंग्स
+// 1. Core Configuration
 let count = 0;
 const targetCount = 108;
-const audioURL = 'https://files.catbox.moe/d2xp40.mp4'; // आपका दिया गया MP4 लिंक
+// Use the provided MP4 link for the success sound
+const audioURL = 'https://files.catbox.moe/d2xp40.mp4'; 
 
-// 2. HTML एलिमेंट्स को पहचानें
+// 2. Element References
 const counterDisplay = document.getElementById('counterDisplay');
 const clickButton = document.getElementById('clickButton');
-const resetButton = document.getElementById('resetButton'); // रिसेट बटन एलिमेंट
-
-// 3. आवाज़ (Audio) तैयार करें
+const resetButton = document.getElementById('resetButton');
 const successAudio = new Audio(audioURL);
 
-// फंक्शन: काउंट को अपडेट करता है और 108 की जाँच करता है
+// Function to update the display and check for the target count
 function updateCounter() {
     counterDisplay.textContent = count;
     
+    // Check if the target is hit
     if (count === targetCount) {
-        // अगर 108 हो गया है, तो आवाज़ चलाएँ और बटन डिसेबल करें
-        // 'play()' फंक्शन को यूजर इंटरेक्शन के बाद ही कॉल किया जा सकता है, जो यहाँ हो रहा है।
-        successAudio.play(); 
-        alert("काउंट 108 पर पहुँच गया है! 🎉 \n\nDeveloper: Spark aka Ravi"); 
-        clickButton.disabled = true; 
-        clickButton.textContent = "लक्ष्य पूरा!";
+        // Play audio only if it's not already playing (to prevent multiple alerts/sounds)
+        if (successAudio.paused) { 
+            successAudio.play().catch(error => {
+                // Catch potential 'play() failed' error if browser blocks auto-play
+                console.error("Audio play failed, may require user interaction:", error);
+            }); 
+            alert(`Target Count of ${targetCount} Reached! 🎉\n\nDeveloper: Spark aka Ravi`); 
+            clickButton.disabled = true; 
+            clickButton.textContent = "Target Reached!";
+        }
     }
 }
 
-// 4. क्लिक बटन हैंडलर
+// 3. Click Button Handler
 clickButton.addEventListener('click', () => {
+    // Only increment if the target hasn't been reached
     if (count < targetCount) {
-        count++; // काउंट बढ़ाएँ
-        updateCounter(); // डिस्प्ले अपडेट करें
+        count++;
+        updateCounter();
     }
 });
 
-// 5. रिसेट बटन हैंडलर
+// 4. Reset Button Handler
 resetButton.addEventListener('click', () => {
-    // काउंट को 0 पर सेट करें
+    // Reset the count and update the display
     count = 0; 
-    updateCounter(); // डिस्प्ले अपडेट करें (जो अब 0 दिखाएगा)
+    updateCounter();
 
-    // बटन को वापस सक्षम (enable) करें
+    // Re-enable the click button
     clickButton.disabled = false;
-    clickButton.textContent = "क्लिक करें";
+    clickButton.textContent = "Click to Increment";
     
-    // अगर आवाज़ चल रही हो तो उसे रोक दें और शुरुआत में सेट करें (optional)
+    // Stop and reset the audio if it was playing
     successAudio.pause();
     successAudio.currentTime = 0; 
     
-    alert("काउंट रिसेट हो गया है।");
+    // Use the professional alert style
+    alert("Count has been reset to 0.");
 });
 
-// शुरुआत में डिस्प्ले सेट करें
+// Initialize the display on page load
 updateCounter();
